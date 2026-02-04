@@ -1,0 +1,70 @@
+{
+  "name": "dangerous-writing",
+  "displayName": "Dangerous Writing",
+  "description": "A writing extension that deletes your text if you stop typing. Set a timer or word count goal and write without stopping!",
+  "version": "0.1.0",
+  "publisher": "karthiktadepalli",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "writing",
+    "productivity",
+    "focus",
+    "timer",
+    "dangerous"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "commands": [
+      {
+        "command": "dangerous-writing.startTimerSession",
+        "title": "Dangerous Writing: Start Timer Session"
+      },
+      {
+        "command": "dangerous-writing.startWordCountSession",
+        "title": "Dangerous Writing: Start Word Count Session"
+      },
+      {
+        "command": "dangerous-writing.stopSession",
+        "title": "Dangerous Writing: Stop Session"
+      }
+    ],
+    "configuration": {
+      "title": "Dangerous Writing",
+      "properties": {
+        "dangerousWriting.inactivityThreshold": {
+          "type": "number",
+          "default": 5,
+          "minimum": 1,
+          "maximum": 60,
+          "description": "Seconds of inactivity before warning appears"
+        },
+        "dangerousWriting.deleteCountdown": {
+          "type": "number",
+          "default": 5,
+          "minimum": 1,
+          "maximum": 30,
+          "description": "Seconds shown in warning countdown before text is deleted"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --target=node16",
+    "watch": "npm run build -- --watch",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.75.0",
+    "@vscode/vsce": "^3.7.1",
+    "esbuild": "^0.20.0",
+    "typescript": "^5.0.0"
+  }
+}
