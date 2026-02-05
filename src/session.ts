@@ -10,7 +10,7 @@ export class DangerousWritingSession {
 
   private startTime: number = 0;
   private startWordCount: number = 0;
-  private startTextLength: number = 0; // Track where the original text ended
+  private snapshotText: string = ''; // Full document text at session start
   private lastActivityTime: number = 0;
 
   private mainInterval: ReturnType<typeof setInterval> | undefined;
@@ -29,7 +29,7 @@ export class DangerousWritingSession {
     this.startTime = Date.now();
     this.lastActivityTime = Date.now();
     this.startWordCount = this.getWordCount();
-    this.startTextLength = this.editor.document.getText().length;
+    this.snapshotText = this.editor.document.getText();
     this.state = 'active';
 
     this.setupChangeListener();
@@ -174,24 +174,18 @@ export class DangerousWritingSession {
     this.state = 'stopped';
 
     const document = this.editor.document;
-    const currentLength = document.getText().length;
 
-    // Only delete text written after the session started
-    if (currentLength > this.startTextLength) {
-      const deleteRange = new vscode.Range(
-        document.positionAt(this.startTextLength),
-        document.positionAt(currentLength)
-      );
+    // Restore the document to its exact state at session start
+    const fullRange = new vscode.Range(
+      document.positionAt(0),
+      document.positionAt(document.getText().length)
+    );
 
-      await this.editor.edit((editBuilder) => {
-        editBuilder.delete(deleteRange);
-      });
+    await this.editor.edit((editBuilder) => {
+      editBuilder.replace(fullRange, this.snapshotText);
+    });
 
-      vscode.window.showErrorMessage('Your session text has been deleted. You stopped typing!');
-    } else {
-      vscode.window.showErrorMessage('Session ended - no new text was written.');
-    }
-
+    vscode.window.showErrorMessage('Your session text has been deleted. You stopped typing!');
     this.cleanup();
   }
 }
